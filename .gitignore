@@ -1,0 +1,9 @@
+data/
+outputs/
+models/
+__pycache__/
+*.pyc
+.DS_Store
+venv/
+*.npy
+*.joblib
