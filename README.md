@@ -1,5 +1,7 @@
 # FaceTrace — Deepfake Detection Tool
 
+🔗 **Live App**: https://facetrace.streamlit.app
+
 A Python-based deepfake detection pipeline using CLIP semantic probes, FFT frequency artifact features, and a Logistic Regression classifier. Includes a Streamlit web UI for image and video analysis.
 
 ---
@@ -109,7 +111,7 @@ Outputs: `outputs/ffpp_eval_results.csv` and `outputs/ffpp_metrics.txt`
 streamlit run app/streamlit_app.py
 ```
 
-Open [http://localhost:8501](http://localhost:8501) in your browser.
+Open https://facetrace.streamlit.app in your browser (or run locally at http://localhost:8501).
 
 ---
 
