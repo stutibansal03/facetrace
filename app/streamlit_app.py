@@ -40,12 +40,12 @@ with st.sidebar:
     st.markdown("**About FaceTrace**")
     st.markdown(
         "A 512-dimensional CLIP image embedding is fed into a neural-network "
-        "classifier trained on 100,000 real and fake faces. "
-        "Held-out test accuracy: 97.4% on the xhlulu dataset."
+        "classifier trained on StyleGAN, face-swap and diffusion fakes (about 115,000 images). "
+        "Held-out test accuracy: 97.3% StyleGAN, 95.3% face-swap, 91.7% diffusion."
     )
     st.caption(
-        "Trained on StyleGAN-generated faces. It may be less reliable on "
-        "fakes from other generators (e.g. diffusion models or face swaps)."
+        "Heavily compressed or unfamiliar AI images can be missed. It may be less reliable on "
+        "fakes from other generators (e.g. newer diffusion models)."
     )
 
 pipeline = get_model()
@@ -78,7 +78,7 @@ if mode == "Image (Photo)":
                 "fake_probability": round(prob, 4),
                 "model": "CLIP ViT-B/32 embedding + MLP",
                 "face_crop_used": use_crop,
-                "note": "Trained on StyleGAN faces; less reliable on other generators.",
+                "note": "Trained on StyleGAN, face-swap and diffusion data; can miss heavily compressed or unfamiliar AI images.",
             }
 
             st.markdown("#### Explanation JSON")
