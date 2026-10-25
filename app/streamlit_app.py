@@ -36,17 +36,6 @@ with st.sidebar:
     st.header("Settings")
     mode = st.radio("Detection Mode", ["Image (Photo)", "Video"])
     use_crop = st.checkbox("Detect and crop face first", value=True)
-    st.markdown("---")
-    st.markdown("**About FaceTrace**")
-    st.markdown(
-        "A 512-dimensional CLIP image embedding is fed into a neural-network "
-        "classifier trained on StyleGAN, face-swap and diffusion fakes (about 115,000 images). "
-        "Held-out test accuracy: 97.3% StyleGAN, 95.3% face-swap, 91.7% diffusion."
-    )
-    st.caption(
-        "Heavily compressed or unfamiliar AI images can be missed. It may be less reliable on "
-        "fakes from other generators (e.g. newer diffusion models)."
-    )
 
 pipeline = get_model()
 
