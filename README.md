@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # FaceTrace: Deepfake Face Detection
 
 Live demo: https://facetrace.streamlit.app
@@ -71,4 +70,3 @@ Datasets are not included in this repository.
 - Train with compression and resize augmentation so the model survives re-saved images
 - Add probability calibration and an "uncertain" output for unfamiliar images
 - Fine-tune the last CLIP layers
-EOF
