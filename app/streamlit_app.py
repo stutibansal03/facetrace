@@ -2,7 +2,6 @@ import sys
 import os
 import json
 import tempfile
-import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 from PIL import Image
@@ -12,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from facetrace.features import extract_features
 from facetrace.classifier import load_model, predict
 from facetrace.video_infer import infer_video
-from facetrace.config import PROMPTS, MODEL_PATH
+from facetrace.config import MODEL_PATH
 
 st.set_page_config(
     page_title="FaceTrace — Deepfake Detector",
@@ -21,14 +20,14 @@ st.set_page_config(
 )
 
 st.title("FaceTrace — Deepfake Detection")
-st.markdown("*Powered by CLIP probes + FFT artifact analysis + Logistic Regression*")
+st.markdown("*CLIP ViT-B/32 image embeddings + neural-network classifier*")
 
 @st.cache_resource
 def get_model():
     if not os.path.exists(MODEL_PATH):
         st.error(
             f"Model not found at `{MODEL_PATH}`. "
-            "Please run `training/01_feature_extract_dataset.py` then `training/02_train_lr.py` first."
+            "Please run `training/01b_extract_features.py` then `training/07_final_train.py` first."
         )
         return None
     return load_model()
@@ -36,12 +35,17 @@ def get_model():
 with st.sidebar:
     st.header("Settings")
     mode = st.radio("Detection Mode", ["Image (Photo)", "Video"])
+    use_crop = st.checkbox("Detect and crop face first", value=True)
     st.markdown("---")
     st.markdown("**About FaceTrace**")
     st.markdown(
-        "Uses CLIP semantic probes (7 features) and FFT frequency "
-        "artifact analysis (2 features) fed into a Logistic Regression "
-        "classifier for deepfake detection."
+        "A 512-dimensional CLIP image embedding is fed into a neural-network "
+        "classifier trained on 100,000 real and fake faces. "
+        "Held-out test accuracy: 97.4% on the xhlulu dataset."
+    )
+    st.caption(
+        "Trained on StyleGAN-generated faces. It may be less reliable on "
+        "fakes from other generators (e.g. diffusion models or face swaps)."
     )
 
 pipeline = get_model()
@@ -59,7 +63,7 @@ if mode == "Image (Photo)":
 
         with col2:
             with st.spinner("Analyzing..."):
-                feats = extract_features(pil, use_face_crop=True)
+                feats = extract_features(pil, use_face_crop=use_crop)
                 label, prob = predict(pipeline, feats)
 
             verdict = "FAKE" if label == 1 else "AUTHENTIC"
@@ -69,38 +73,12 @@ if mode == "Image (Photo)":
             st.metric("Fake Probability", f"{prob:.1%}")
             st.progress(float(prob))
 
-            clip_scores = feats[:7].tolist()
-            fft_scores = feats[7:].tolist()
-
-            st.markdown("#### CLIP Probe Scores")
-            fig, ax = plt.subplots(figsize=(6, 3))
-            colors = ["tomato" if i % 2 == 1 else "steelblue" for i in range(len(PROMPTS))]
-            ax.barh(
-                [p[:35] + "..." if len(p) > 35 else p for p in PROMPTS],
-                clip_scores,
-                color=colors,
-            )
-            ax.set_xlabel("Cosine Similarity")
-            ax.set_title("CLIP Probe Similarities")
-            plt.tight_layout()
-            st.pyplot(fig)
-            plt.close(fig)
-
-            st.markdown("#### FFT Artifact Features")
-            st.table({
-                "Feature": ["High-Freq Energy Ratio", "Mid-High Band Ratio"],
-                "Value": [f"{fft_scores[0]:.4f}", f"{fft_scores[1]:.4f}"],
-            })
-
             explanation = {
                 "verdict": verdict,
                 "fake_probability": round(prob, 4),
-                "clip_probe_scores": {p: round(s, 4) for p, s in zip(PROMPTS, clip_scores)},
-                "fft_features": {
-                    "high_freq_energy_ratio": round(fft_scores[0], 4),
-                    "mid_high_band_ratio": round(fft_scores[1], 4),
-                },
-                "top_contributing_prompt": PROMPTS[int(np.argmax(np.abs(clip_scores)))],
+                "model": "CLIP ViT-B/32 embedding + MLP",
+                "face_crop_used": use_crop,
+                "note": "Trained on StyleGAN faces; less reliable on other generators.",
             }
 
             st.markdown("#### Explanation JSON")

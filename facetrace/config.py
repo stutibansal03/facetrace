@@ -1,6 +1,6 @@
 import os
 
-CLIP_MODEL_NAME = "ViT-B-32"
+CLIP_MODEL_NAME = os.environ.get("FACETRACE_CLIP", "ViT-B-32")
 CLIP_PRETRAINED = "openai"
 
 PROMPTS = [
@@ -19,6 +19,6 @@ VIDEO_FRAME_STEP = 3
 VIDEO_MAX_FRAMES = 60
 TOP_SUSPICIOUS_FRAMES = 5
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "facetrace_lr.joblib")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "facetrace_mlp.joblib")
 OUTPUTS_DIR = os.path.join(os.path.dirname(__file__), "..", "outputs")
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
